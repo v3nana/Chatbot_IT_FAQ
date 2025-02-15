@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Course FAQ Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffe6f2; /* Light pink background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #chat-container {
+      width: 400px;
+      height: 600px;
+      background-color: #ffe6f2;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    #chat-header {
+      background-color: #ff4d94; /* Dark pink header */
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #chat-log {
+      flex-grow: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff0f5; /* Light pink chat background */
+    }
+    .chat-bubble {
+      max-width: 75%;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 20px;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+    .user-message {
+      background-color: #ff66a3; /* Medium pink for user messages */
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+    .bot-message {
+      background-color: #ffcce6; /* Soft pink for bot messages */
+      color: black;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+    }
+    #chat-input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background-color: white;
+    }
+    #user-input {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+    }
+    button {
+      background-color: #ff4d94; /* Dark pink for send button */
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #e60073; /* Slightly darker pink on hover */
+    }
+  </style>
+</head>
+<body>
+
+  <div id="chat-container">
+    <div id="chat-header">IT FAQ Chatbot</div>
+    <div id="chat-log"></div>
+    <div id="chat-input-area">
+      <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
+      <button onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const userInput = document.getElementById('user-input');
+      const message = userInput.value.trim();
+      if (message === "") return;
+
+      const chatLog = document.getElementById('chat-log');
+      chatLog.innerHTML += `<div class="chat-bubble user-message">You: ${message}</div>`;
+
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        chatLog.innerHTML += `<div class="chat-bubble bot-message">Venana AI: ${data.response}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        chatLog.innerHTML += `<div class="chat-bubble bot-message" style="color: red;">Error communicating with chatbot.</div>`;
+      });
+
+      userInput.value = "";
+    }
+
+    document.getElementById('user-input').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+
+</body>
+</html>
